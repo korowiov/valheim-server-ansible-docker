@@ -1,0 +1,5 @@
+---
+- hosts: valheimhost
+  roles:
+    - role: docker/setup
+    - role: valheim/setup

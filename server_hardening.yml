@@ -1,0 +1,29 @@
+- hosts: valheimhost
+  roles:
+    - githubixx.harden-linux
+  vars:
+    harden_linux_root_password: "" # current root pass
+    harden_linux_deploy_user: {{ deploy_user_name }} 
+    harden_linux_deploy_user_password: "" # new user pass
+    harden_linux_deploy_user_home: {{ deploy_user_home }}
+    harden_linux_deploy_user_public_keys:
+      - /Users/user/.ssh/id_rsa.pub # path to your ssh key
+    harden_linux_sshd_settings_user:
+      "^Port ": "Port 2200"
+    harden_linux_ufw_rules:
+      - rule: "allow"
+        to_port: "22"
+        protocol: "tcp"
+      - rule: "allow"
+        to_port: "2200"
+        protocol: "tcp"
+      - rule: "allow"
+        to_port: "2456:2457"
+        protocol: "udp"
+      - rule: "allow"
+        to_port: "9001"
+        protocol: "tcp"
+    harden_linux_sshguard_whitelist:
+      - "127.0.0.0/8"
+      - "::1/128"
+      - "xxx.xxx.xxx.xxx" # your ip address 

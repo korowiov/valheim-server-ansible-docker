@@ -1,0 +1,49 @@
+- name: Deploy server valheim
+  block:
+    - name: Set server path
+      set_fact:
+        server_path: "{{ deploy_user_home }}/valheim_server"
+    
+    - name: Create server path
+      file:
+        path: "{{ server_path }}"
+        state: directory
+
+    - name: Create necessary folders
+      file:
+        path: "{{ server_path }}/{{ item }}"
+        state: directory
+        force: yes
+        mode: a-x,u=rwx,g=rwx,o=rwx
+        recurse: yes
+      with_items:
+        - "shared/data"
+        - "shared/cfg"
+    
+    - name: Set variables
+      set_fact:
+        valheim_cfg_path: "{{ server_path }}/shared/cfg"
+        valheim_data_path: "{{ server_path }}/shared/data"
+
+    - name: Copy docker compose and env file
+      template:
+        src: "{{ item }}.j2"
+        dest: "{{ server_path }}/{{ item }}"
+        force: true
+      with_items:
+        - docker-compose.yml
+        - .env
+
+    - name: Remove containers
+      command: docker-compose rm -f -s valheim_server
+      args:
+        chdir: "{{ server_path }}"
+      ignore_errors: yes
+
+    - name: Up service
+      command: docker-compose up -d valheim_server
+      args:
+        chdir: "{{ server_path }}"
+      register: service_up
+
+  become: yes

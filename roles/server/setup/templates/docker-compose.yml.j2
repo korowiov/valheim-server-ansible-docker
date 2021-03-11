@@ -1,0 +1,18 @@
+version: '3.3'
+
+services:
+  valheim_server:
+    image: lloesche/valheim-server:latest
+    cap_add:
+      - sys_nice
+    volumes:
+      - {{ valheim_cfg_path }}:$VALHEIM_CFG_PATH
+      - {{ valheim_data_path }}:$VALHEIM_DATA_PATH
+    network_mode: "host"
+    ports: 
+      - "2456-2457:2456-2457/udp"
+      - "9001:9001/tcp"
+    env_file:
+      - .env
+    restart: always
+    stop_grace_period: 2m
